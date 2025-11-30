@@ -1,0 +1,248 @@
+import { useState, useMemo } from 'react';
+import { useDealer } from '../../contexts/DealerContext';
+import {
+    Search,
+    Filter,
+    ChevronDown,
+    ChevronUp,
+    Eye,
+    Edit,
+    Trash2,
+    ChevronLeft,
+    ChevronRight
+} from 'lucide-react';
+import './DealerList.css';
+
+const DealerList = ({ onViewDealer, onEditDealer }) => {
+    const { dealers, deleteDealer } = useDealer();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [sortBy, setSortBy] = useState('name');
+    const [sortOrder, setSortOrder] = useState('asc');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
+    // Filtering and sorting logic
+    const filteredAndSortedDealers = useMemo(() => {
+        let result = [...dealers];
+
+        // Search filter
+        if (searchTerm) {
+            result = result.filter(dealer =>
+                dealer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                dealer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                dealer.address.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Status filter
+        if (filterStatus !== 'all') {
+            result = result.filter(dealer => dealer.status === filterStatus);
+        }
+
+        // Sorting
+        result.sort((a, b) => {
+            let aValue = a[sortBy];
+            let bValue = b[sortBy];
+
+            if (sortBy === 'createdAt') {
+                aValue = new Date(aValue);
+                bValue = new Date(bValue);
+            }
+
+            if (typeof aValue === 'string') {
+                aValue = aValue.toLowerCase();
+                bValue = bValue.toLowerCase();
+            }
+
+            if (sortOrder === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+
+        return result;
+    }, [dealers, searchTerm, filterStatus, sortBy, sortOrder]);
+
+    // Pagination logic
+    const totalPages = Math.ceil(filteredAndSortedDealers.length / itemsPerPage);
+    const paginatedDealers = filteredAndSortedDealers.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    const handleSort = (field) => {
+        if (sortBy === field) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(field);
+            setSortOrder('asc');
+        }
+    };
+
+    const handleDelete = (dealer) => {
+        if (window.confirm(`Are you sure you want to delete ${dealer.name}?`)) {
+            deleteDealer(dealer.id);
+        }
+    };
+
+    const SortIcon = ({ field }) => {
+        if (sortBy !== field) return null;
+        return sortOrder === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
+    };
+
+    return (
+        <div className="dealer-list-container">
+            <div className="list-header">
+                <h2>All Dealers</h2>
+                <div className="list-controls">
+                    <div className="search-box">
+                        <Search size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search dealers..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                        />
+                    </div>
+
+                    <div className="filter-box">
+                        <Filter size={18} />
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => {
+                                setFilterStatus(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                        >
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div className="table-container">
+                <table className="dealer-table">
+                    <thead>
+                        <tr>
+                            <th onClick={() => handleSort('name')} className="sortable">
+                                <span className="th-content">Dealer Name <SortIcon field="name" /></span>
+                            </th>
+                            <th onClick={() => handleSort('email')} className="sortable">
+                                <span className="th-content">Email <SortIcon field="email" /></span>
+                            </th>
+                            <th onClick={() => handleSort('phone')} className="sortable">
+                                <span className="th-content">Phone <SortIcon field="phone" /></span>
+                            </th>
+                            <th onClick={() => handleSort('status')} className="sortable">
+                                <span className="th-content">Status <SortIcon field="status" /></span>
+                            </th>
+                            <th onClick={() => handleSort('createdAt')} className="sortable">
+                                <span className="th-content">Created <SortIcon field="createdAt" /></span>
+                            </th>
+                            <th><span className="th-content">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {paginatedDealers.length === 0 ? (
+                            <tr>
+                                <td colSpan="6" className="no-data">
+                                    No dealers found
+                                </td>
+                            </tr>
+                        ) : (
+                            paginatedDealers.map((dealer) => (
+                                <tr key={dealer.id}>
+                                    <td className="dealer-name">{dealer.name}</td>
+                                    <td>{dealer.email}</td>
+                                    <td>{dealer.phone}</td>
+                                    <td>
+                                        <span className={`status-badge ${dealer.status}`}>
+                                            {dealer.status}
+                                        </span>
+                                    </td>
+                                    <td>{new Date(dealer.createdAt).toLocaleDateString()}</td>
+                                    <td>
+                                        <div className="action-buttons">
+                                            <button
+                                                className="action-btn view"
+                                                onClick={() => onViewDealer(dealer)}
+                                                title="View Details"
+                                            >
+                                                <Eye size={16} />
+                                            </button>
+                                            <button
+                                                className="action-btn edit"
+                                                onClick={() => onEditDealer(dealer)}
+                                                title="Edit Dealer"
+                                            >
+                                                <Edit size={16} />
+                                            </button>
+                                            <button
+                                                className="action-btn delete"
+                                                onClick={() => handleDelete(dealer)}
+                                                title="Delete Dealer"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {totalPages > 1 && (
+                <div className="pagination">
+                    <button
+                        className="page-btn"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft size={18} />
+                        Previous
+                    </button>
+
+                    <div className="page-numbers">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                className={`page-number ${currentPage === page ? 'active' : ''}`}
+                                onClick={() => setCurrentPage(page)}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button
+                        className="page-btn"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                        <ChevronRight size={18} />
+                    </button>
+                </div>
+            )}
+
+            <div className="list-footer">
+                <p>
+                    Showing {paginatedDealers.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{' '}
+                    {Math.min(currentPage * itemsPerPage, filteredAndSortedDealers.length)} of{' '}
+                    {filteredAndSortedDealers.length} dealers
+                </p>
+            </div>
+        </div>
+    );
+};
+
+export default DealerList;

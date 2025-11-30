@@ -1,0 +1,51 @@
+# Node dependencies
+node_modules/
+
+# Logs
+*.log
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE and editor folders
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+
+# Misc
+coverage/
+*.tgz
+
+# Optional npm cache directory
+.npm
+
+# Mac system files
+.AppleDouble
+.LSOverride
+
+# Windows system files
+Desktop.ini
+$RECYCLE.BIN/
+
+# VS Code settings
+.history/
+
+# Others
+*.swp
+*.bak
+*.tmp
