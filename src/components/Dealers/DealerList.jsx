@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import ConfirmDialog from '../Common/ConfirmDialog';
 import { useDealer } from '../../contexts/DealerContext';
 import {
     Search,
@@ -106,10 +107,25 @@ const DealerList = ({ onViewDealer, onEditDealer }) => {
         }
     };
 
-    const handleDelete = (dealer) => {
-        if (window.confirm(`Are you sure you want to delete ${dealer.name}?`)) {
-            deleteDealer(dealer.id);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [dealerToDelete, setDealerToDelete] = useState(null);
+
+    const handleDeleteClick = (dealer) => {
+        setDealerToDelete(dealer);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (dealerToDelete) {
+            deleteDealer(dealerToDelete.id);
         }
+        setConfirmOpen(false);
+        setDealerToDelete(null);
+    };
+
+    const handleCancelDelete = () => {
+        setConfirmOpen(false);
+        setDealerToDelete(null);
     };
 
     const SortIcon = ({ field }) => {
@@ -211,7 +227,7 @@ const DealerList = ({ onViewDealer, onEditDealer }) => {
                                             </button>
                                             <button
                                                 className="action-btn delete"
-                                                onClick={() => handleDelete(dealer)}
+                                                onClick={() => handleDeleteClick(dealer)}
                                                 title="Delete Dealer"
                                             >
                                                 <Trash2 size={16} />
@@ -286,6 +302,13 @@ const DealerList = ({ onViewDealer, onEditDealer }) => {
                     </p>
                 </div>
             </div>
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Delete Dealer?"
+                message={dealerToDelete ? `Are you sure you want to delete dealer "${dealerToDelete.name}"? This action cannot be undone.` : ''}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
         </div>
     );
 };
