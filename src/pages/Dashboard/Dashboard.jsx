@@ -60,7 +60,7 @@ const Dashboard = () => {
         },
         {
             label: 'Revenue',
-            value: '$124,500',
+            value: '$1245',
             change: '+15%',
             trend: 'up',
             icon: DollarSign,
@@ -76,7 +76,7 @@ const Dashboard = () => {
         }
     ];
 
-    const recentDealers = dealers.slice(0, 5);
+
 
     return (
         <div className="dashboard">
@@ -107,30 +107,7 @@ const Dashboard = () => {
                 ))}
             </div>
 
-            <div className="dashboard-content">
-                <div className="content-section full-width-section">
-                    <div className="section-title">
-                        <h2>Recent Dealers</h2>
-                        <a href="/dealers" className="view-all-link">View All</a>
-                    </div>
-                    <div className="dealers-list">
-                        {recentDealers.map((dealer) => (
-                            <div key={dealer.id} className="dealer-item">
-                                <div className="dealer-avatar-small">
-                                    {dealer.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div className="dealer-info-small">
-                                    <h4>{dealer.name}</h4>
-                                    <p>{dealer.email}</p>
-                                </div>
-                                <span className={`status-pill ${dealer.status}`}>
-                                    {dealer.status}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+
 
             <div className="dashboard-dealers-section">
                 <DealerList

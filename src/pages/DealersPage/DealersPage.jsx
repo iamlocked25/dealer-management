@@ -6,6 +6,8 @@ import DealerDetails from '../../components/Dealers/DealerDetails';
 import DealerForm from '../../components/Dealers/DealerForm';
 import { UserPlus } from 'lucide-react';
 import './DealersPage.css';
+import SuccessCard from '../../components/Common/SuccessCard';
+import Loader from '../../components/Common/Loader';
 
 const DealersPage = () => {
     const { dealers } = useDealer();
@@ -13,6 +15,8 @@ const DealersPage = () => {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [selectedDealer, setSelectedDealer] = useState(null);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleViewDealer = (dealer) => {
         setSelectedDealer(dealer);
@@ -31,6 +35,12 @@ const DealersPage = () => {
 
     const handleAddSuccess = () => {
         setAddModalOpen(false);
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+            setSuccessMessage('Dealer created successfully!');
+            setTimeout(() => setSuccessMessage(''), 3000);
+        }, 800); // simulate loading for 0.8s
     };
 
     const handleCloseModals = () => {
@@ -42,6 +52,10 @@ const DealersPage = () => {
 
     return (
         <div className="dealers-page">
+            {loading && <Loader />}
+            {successMessage && !loading && (
+                <SuccessCard message={successMessage} />
+            )}
             <div className="page-header">
                 <div className="header-text">
                     <div>
@@ -73,10 +87,13 @@ const DealersPage = () => {
                 </div>
             </div>
 
-            <DealerList
-                onViewDealer={handleViewDealer}
-                onEditDealer={handleEditDealer}
-            />
+            {!loading && (
+                <DealerList
+                    onViewDealer={handleViewDealer}
+                    onEditDealer={handleEditDealer}
+                    key={dealers.length} // force re-render on add
+                />
+            )}
 
             <Modal
                 isOpen={viewModalOpen}

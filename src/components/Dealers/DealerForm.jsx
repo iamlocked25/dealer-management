@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import DealerPreviewCard from './DealerPreviewCard';
 import { useDealer } from '../../contexts/DealerContext';
 import './DealerForm.css';
 
@@ -16,6 +17,8 @@ const DealerForm = ({ dealer, onSuccess, onCancel, mode = 'add' }) => {
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
 
     useEffect(() => {
         if (dealer && mode === 'edit') {
@@ -106,8 +109,13 @@ const DealerForm = ({ dealer, onSuccess, onCancel, mode = 'add' }) => {
             return;
         }
 
-        setIsSubmitting(true);
+        // Show preview card before final submission
+        setPreviewData({ ...formData, status: 'active' });
+        setShowPreview(true);
+    };
 
+    const handleConfirm = async () => {
+        setIsSubmitting(true);
         try {
             let result;
             if (mode === 'edit' && dealer) {
@@ -115,15 +123,19 @@ const DealerForm = ({ dealer, onSuccess, onCancel, mode = 'add' }) => {
             } else {
                 result = await addDealer(formData);
             }
-
             if (result.success) {
                 onSuccess(result.dealer || formData);
+                setShowPreview(false);
             }
         } catch (error) {
             console.error('Error submitting form:', error);
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handlePreviewCancel = () => {
+        setShowPreview(false);
     };
 
     const handleReset = () => {
@@ -149,127 +161,154 @@ const DealerForm = ({ dealer, onSuccess, onCancel, mode = 'add' }) => {
     };
 
     return (
-        <form className="dealer-form" onSubmit={handleSubmit} noValidate>
-            <div className="form-grid">
-                <div className="form-group">
-                    <label htmlFor="name">
-                        Dealer Name <span className="required">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={errors.name && touched.name ? 'error' : ''}
-                        placeholder="Enter dealer name"
-                    />
-                    {errors.name && touched.name && (
-                        <span className="error-message">{errors.name}</span>
-                    )}
-                </div>
+        <>
+            {!showPreview ? (
+                <form className="dealer-form" onSubmit={handleSubmit} noValidate>
+                    <div className="form-grid">
+                        {/* ...existing form fields... */}
+                        <div className="form-group">
+                            <label htmlFor="name">
+                                Dealer Name <span className="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className={errors.name && touched.name ? 'error' : ''}
+                                placeholder="Enter dealer name"
+                            />
+                            {errors.name && touched.name && (
+                                <span className="error-message">{errors.name}</span>
+                            )}
+                        </div>
 
-                <div className="form-group">
-                    <label htmlFor="email">
-                        Email <span className="required">*</span>
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={errors.email && touched.email ? 'error' : ''}
-                        placeholder="dealer@example.com"
-                    />
-                    {errors.email && touched.email && (
-                        <span className="error-message">{errors.email}</span>
-                    )}
-                </div>
+                        <div className="form-group">
+                            <label htmlFor="email">
+                                Email <span className="required">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className={errors.email && touched.email ? 'error' : ''}
+                                placeholder="dealer@example.com"
+                            />
+                            {errors.email && touched.email && (
+                                <span className="error-message">{errors.email}</span>
+                            )}
+                        </div>
 
-                <div className="form-group">
-                    <label htmlFor="phone">
-                        Phone Number <span className="required">*</span>
-                    </label>
-                    <div className="phone-input-group">
-                        <span className="phone-prefix">+91</span>
-                        <input
-                            type="text"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            className={errors.phone && touched.phone ? 'error' : ''}
-                            placeholder="9876543210"
-                            maxLength={10}
-                            pattern="^\d{10}$"
-                        />
+                        <div className="form-group">
+                            <label htmlFor="phone">
+                                Phone Number <span className="required">*</span>
+                            </label>
+                            <div className="phone-input-group">
+                                <span className="phone-prefix">+91</span>
+                                <input
+                                    type="text"
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={errors.phone && touched.phone ? 'error' : ''}
+                                    placeholder="9876543210"
+                                    maxLength={10}
+                                    pattern="^\d{10}$"
+                                />
+                            </div>
+                            {errors.phone && touched.phone && (
+                                <span className="error-message">{errors.phone}</span>
+                            )}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="operatingHours">
+                                Operating Hours <span className="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="operatingHours"
+                                name="operatingHours"
+                                value={formData.operatingHours}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className={errors.operatingHours && touched.operatingHours ? 'error' : ''}
+                                placeholder="9:00 AM - 6:00 PM"
+                            />
+                            {errors.operatingHours && touched.operatingHours && (
+                                <span className="error-message">{errors.operatingHours}</span>
+                            )}
+                        </div>
+
+                        <div className="form-group full-width">
+                            <label htmlFor="address">
+                                Address <span className="required">*</span>
+                            </label>
+                            <textarea
+                                id="address"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className={errors.address && touched.address ? 'error' : ''}
+                                placeholder="Enter complete address"
+                                rows="3"
+                            />
+                            {errors.address && touched.address && (
+                                <span className="error-message">{errors.address}</span>
+                            )}
+                        </div>
                     </div>
-                    {errors.phone && touched.phone && (
-                        <span className="error-message">{errors.phone}</span>
-                    )}
-                </div>
 
-                <div className="form-group">
-                    <label htmlFor="operatingHours">
-                        Operating Hours <span className="required">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="operatingHours"
-                        name="operatingHours"
-                        value={formData.operatingHours}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={errors.operatingHours && touched.operatingHours ? 'error' : ''}
-                        placeholder="9:00 AM - 6:00 PM"
-                    />
-                    {errors.operatingHours && touched.operatingHours && (
-                        <span className="error-message">{errors.operatingHours}</span>
-                    )}
+                    <div className="form-actions">
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={onCancel || handleReset}
+                            disabled={isSubmitting}
+                        >
+                            {onCancel ? 'Cancel' : 'Reset'}
+                        </button>
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Saving...' : mode === 'edit' ? 'Update Dealer' : 'Add Dealer'}
+                        </button>
+                    </div>
+                </form>
+            ) : (
+                <div>
+                    <DealerPreviewCard dealer={previewData} />
+                    <div className="form-actions" style={{ justifyContent: 'center', marginTop: 24 }}>
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={handlePreviewCancel}
+                            disabled={isSubmitting}
+                        >
+                            Edit
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleConfirm}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Saving...' : 'Confirm & Create'}
+                        </button>
+                    </div>
                 </div>
-
-                <div className="form-group full-width">
-                    <label htmlFor="address">
-                        Address <span className="required">*</span>
-                    </label>
-                    <textarea
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={errors.address && touched.address ? 'error' : ''}
-                        placeholder="Enter complete address"
-                        rows="3"
-                    />
-                    {errors.address && touched.address && (
-                        <span className="error-message">{errors.address}</span>
-                    )}
-                </div>
-            </div>
-
-            <div className="form-actions">
-                <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={onCancel || handleReset}
-                    disabled={isSubmitting}
-                >
-                    {onCancel ? 'Cancel' : 'Reset'}
-                </button>
-                <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isSubmitting}
-                >
-                    {isSubmitting ? 'Saving...' : mode === 'edit' ? 'Update Dealer' : 'Add Dealer'}
-                </button>
-            </div>
-        </form>
+            )}
+        </>
     );
 };
 

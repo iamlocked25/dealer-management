@@ -1,0 +1,69 @@
+.dealer-preview-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(59, 130, 246, 0.10);
+    padding: 2rem 2.5rem;
+    margin: 2rem auto 0 auto;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInCard 0.5s cubic-bezier(.4, 0, .2, 1);
+}
+
+.dealer-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.dealer-preview-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.status-badge {
+    background: #dcfce7;
+    color: #166534;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    margin-left: 0.5rem;
+}
+
+.status-badge.inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.dealer-preview-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dealer-preview-details div {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.05rem;
+    color: #374151;
+}
+
+@keyframes fadeInCard {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}

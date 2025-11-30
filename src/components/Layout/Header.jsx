@@ -5,13 +5,13 @@ const Header = () => {
     return (
         <header className="header">
             <div className="header-left">
-                <h2 className="header-title">Dealer Management System</h2>
+                <h2 className="header-title">DMS</h2>
             </div>
 
             <div className="header-right">
                 <button className="icon-button">
                     <Bell size={20} />
-                    <span className="notification-badge">3</span>
+                    {/* <span className="notification-badge">3</span> */}
                 </button>
 
                 <div className="user-menu">

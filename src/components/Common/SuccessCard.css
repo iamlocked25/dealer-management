@@ -1,0 +1,53 @@
+.shadcn-success-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+    color: #fff;
+    padding: 1.25rem 2rem;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(34, 197, 94, 0.18);
+    margin-bottom: 2rem;
+    animation: fadeInOut 3s linear;
+}
+
+.shadcn-success-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+}
+
+.shadcn-success-content h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.shadcn-success-content p {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}

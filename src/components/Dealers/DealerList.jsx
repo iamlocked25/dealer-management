@@ -20,7 +20,8 @@ const DealerList = ({ onViewDealer, onEditDealer }) => {
     const [sortBy, setSortBy] = useState('name');
     const [sortOrder, setSortOrder] = useState('asc');
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    const perPageOptions = [5, 10, 50, 100];
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     // Filtering and sorting logic
     const filteredAndSortedDealers = useMemo(() => {
@@ -71,6 +72,30 @@ const DealerList = ({ onViewDealer, onEditDealer }) => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    // Smart pagination for large lists
+    const getPageNumbers = () => {
+        const maxPagesToShow = 7;
+        if (totalPages <= maxPagesToShow) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
+        }
+        const pages = [];
+        let start = Math.max(1, currentPage - 2);
+        let end = Math.min(totalPages, currentPage + 2);
+        if (currentPage <= 3) {
+            end = 5;
+        } else if (currentPage >= totalPages - 2) {
+            start = totalPages - 4;
+        }
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        if (start > 2) pages.unshift('...');
+        if (start > 1) pages.unshift(1);
+        if (end < totalPages - 1) pages.push('...');
+        if (end < totalPages) pages.push(totalPages);
+        return pages;
+    };
 
     const handleSort = (field) => {
         if (sortBy === field) {
@@ -212,15 +237,17 @@ const DealerList = ({ onViewDealer, onEditDealer }) => {
                     </button>
 
                     <div className="page-numbers">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                            <button
-                                key={page}
-                                className={`page-number ${currentPage === page ? 'active' : ''}`}
-                                onClick={() => setCurrentPage(page)}
-                            >
-                                {page}
-                            </button>
-                        ))}
+                        {getPageNumbers().map((page, idx) =>
+                            page === '...'
+                                ? <span key={idx} className="page-ellipsis">...</span>
+                                : <button
+                                    key={page}
+                                    className={`page-number ${currentPage === page ? 'active' : ''}`}
+                                    onClick={() => setCurrentPage(page)}
+                                >
+                                    {page}
+                                </button>
+                        )}
                     </div>
 
                     <button
@@ -235,11 +262,29 @@ const DealerList = ({ onViewDealer, onEditDealer }) => {
             )}
 
             <div className="list-footer">
-                <p>
-                    Showing {paginatedDealers.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{' '}
-                    {Math.min(currentPage * itemsPerPage, filteredAndSortedDealers.length)} of{' '}
-                    {filteredAndSortedDealers.length} dealers
-                </p>
+                <div className="footer-flex">
+                    <div className="per-page-box">
+                        <label htmlFor="perPageSelect">Show </label>
+                        <select
+                            id="perPageSelect"
+                            value={itemsPerPage}
+                            onChange={e => {
+                                setItemsPerPage(Number(e.target.value));
+                                setCurrentPage(1);
+                            }}
+                        >
+                            {perPageOptions.map(opt => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                        </select>
+                        <span> entries</span>
+                    </div>
+                    <p>
+                        Showing {paginatedDealers.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{' '}
+                        {Math.min(currentPage * itemsPerPage, filteredAndSortedDealers.length)} of{' '}
+                        {filteredAndSortedDealers.length} dealers
+                    </p>
+                </div>
             </div>
         </div>
     );

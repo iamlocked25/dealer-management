@@ -39,13 +39,6 @@ const Sidebar = () => {
                 ))}
             </nav>
 
-            <div className="sidebar-footer">
-                <div className="help-card">
-                    <h3>Need Help?</h3>
-                    <p>Check our documentation</p>
-                    <button className="help-button">Learn More</button>
-                </div>
-            </div>
         </aside>
     );
 };
